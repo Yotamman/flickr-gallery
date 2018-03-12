@@ -4,53 +4,94 @@ import FontAwesome from 'react-fontawesome';
 import './Image.scss';
 
 class Image extends React.Component {
-  static propTypes = {
-    dto: PropTypes.object,
-    galleryWidth: PropTypes.number
-  };
-
-  constructor(props) {
-    super(props);
-    this.calcImageSize = this.calcImageSize.bind(this);
-    this.state = {
-      size: 200
+    static propTypes = {
+      dto: PropTypes.object,
+      galleryWidth: PropTypes.number
     };
-  }
 
-  calcImageSize() {
-    const {galleryWidth} = this.props;
-    const targetSize = 200;
-    const imagesPerRow = Math.round(galleryWidth / targetSize);
-    const size = (galleryWidth / imagesPerRow);
-    this.setState({
-      size
-    });
-  }
+    constructor(props) {
+      super(props);
+      this.calcImageSize = this.calcImageSize.bind(this);
+      this.rotate = this.rotate.bind(this);
+      this.delete = this.delete.bind(this);
+      this.state = {
+        size: 200,
+        rotation: 0,
+        showImage: true
+      };
+    }
 
-  componentDidMount() {
-    this.calcImageSize();
-  }
+    calcImageSize() {
+      const {galleryWidth} = this.props;
+      const targetSize = 200;
+      const imagesPerRow = Math.round(galleryWidth / targetSize);
+      const size = (galleryWidth / imagesPerRow);
+      this.setState({
+        size
+      });
+    }
 
-  urlFromDto(dto) {
-    return `https://farm${dto.farm}.staticflickr.com/${dto.server}/${dto.id}_${dto.secret}.jpg`;
-  }
+    componentDidMount() {
+      this.calcImageSize();
+    }
+
+    urlFromDto(dto) {
+      return `https://farm${dto.farm}.staticflickr.com/${dto.server}/${dto.id}_${dto.secret}.jpg`;
+    }
+
+    rotate(){
+      let newRotation = this.state.rotation + 90;
+      if(newRotation >= 360){
+        newRotation =- 360;
+      }
+      this.setState({
+        rotation: newRotation
+      })
+    }
+
+    expand(){
+      alert('expand!!!!');
+    }
+
+    delete(){
+      this.setState({
+        showImage: false//changes the state of the componenat to not show the image
+      });
+    }
 
   render() {
-    return (
-      <div
-        className="image-root"
-        style={{
+      const { rotation } =  this.state;
+      const { showImage } = this.state;
+      var noButton = {
+           backgroundColor: 'Transparent',
+           outline: 'none',
+           border: 'none',
+           overflow: 'hidden',
+           padding:0
+    }//this style is in order to remove the button component GUI
+
+    if(showImage){//Conditional Rendering, wether to show or not the picture
+      var showImageSt = {
           backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
           width: this.state.size + 'px',
-          height: this.state.size + 'px'
-        }}
-        >
-        <div>
-          <FontAwesome className="image-icon" name="sync-alt" title="rotate"/>
-          <FontAwesome className="image-icon" name="trash-alt" title="delete"/>
-          <FontAwesome className="image-icon" name="expand" title="expand"/>
-        </div>
-      </div>
+          height: this.state.size + 'px',
+          transform: `rotate(${rotation}deg)`
+      }
+    }
+    return (
+              <div className="image-root" style={showImageSt}>
+              <div style={{transform: `rotate(${-rotation}deg)`}}>
+                <button style={noButton} onClick={this.rotate}>
+                    <FontAwesome className="image-icon" name="sync-alt" title="Rotate"/>
+                </button>
+                <button style={noButton} onClick={this.delete}>
+                    <FontAwesome className="image-icon" name="trash-alt" title="delete"/>
+                </button>
+                <button style={noButton} onClick={this.expand}>
+                    <FontAwesome className="image-icon" name="expand" title="expand"/>
+                </button>
+              </div>
+            </div>
     );
   }
 }
