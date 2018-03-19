@@ -102,7 +102,8 @@ class Gallery extends React.Component {
       }
 
       urlFromObj(obj) {
-        return {src: `https://farm${obj.farm}.staticflickr.com/${obj.server}/${obj.id}_${obj.secret}.jpg`}
+        console.log(obj);
+        return {src: `https://farm${obj.farm}.staticflickr.com/${obj.server}/${obj.id}_${obj.secret}_b.jpg`}
       }
 
       componentWillReceiveProps(props) {
