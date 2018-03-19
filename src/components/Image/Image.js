@@ -6,7 +6,8 @@ import './Image.scss';
 class Image extends React.Component {
     static propTypes = {
       dto: PropTypes.object,
-      galleryWidth: PropTypes.number
+      galleryWidth: PropTypes.number,
+      index: PropTypes.number
     };
 
     constructor(props) {
@@ -14,10 +15,13 @@ class Image extends React.Component {
       this.calcImageSize = this.calcImageSize.bind(this);
       this.rotate = this.rotate.bind(this);
       this.delete = this.delete.bind(this);
+      this.expand = this.expand.bind(this);
+
       this.state = {
         size: 200,
-        rotation: 0,
-        showImage: true
+        rotation: 0,//new state for rotating the image
+        showImage: true,//new state for showing the image
+        expandImage: false
       };
     }
 
@@ -27,7 +31,7 @@ class Image extends React.Component {
       const imagesPerRow = Math.round(galleryWidth / targetSize);
       const size = (galleryWidth / imagesPerRow);
       this.setState({
-        size
+          size
       });
     }
 
@@ -49,49 +53,53 @@ class Image extends React.Component {
       })
     }
 
-    expand(){
-      alert('expand!!!!');
-    }
-
     delete(){
       this.setState({
-        showImage: false//changes the state of the componenat to not show the image
+        showImage: false//changes the state of the componenat so it won't show the image
       });
+    }
+
+    expand(){
+      this.setState({
+        expandImage: true
+      });
+      this.props.getExpanded(this.state.expandImage,this.props.index);
+      console.log("1");
     }
 
   render() {
       const { rotation } =  this.state;
       const { showImage } = this.state;
-      var noButton = {
+      var noButton = {//this style is in order to remove the button GUI component
            backgroundColor: 'Transparent',
            outline: 'none',
            border: 'none',
            overflow: 'hidden',
            padding:0
-    }//this style is in order to remove the button component GUI
+    }
 
-    if(showImage){//Conditional Rendering, wether to show or not the picture
-      var showImageSt = {
-          backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
-          width: this.state.size + 'px',
-          height: this.state.size + 'px',
-          transform: `rotate(${rotation}deg)`
-      }
+    if(showImage){//Conditional Rendering, wether or not to show the image
+        var showImageSt = {
+            backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
+            width: this.state.size + 'px',
+            height: this.state.size + 'px',
+            transform: `rotate(${rotation}deg)`
+        }
     }
     return (
               <div className="image-root" style={showImageSt}>
               <div style={{transform: `rotate(${-rotation}deg)`}}>
-                <button style={noButton} onClick={this.rotate}>
-                    <FontAwesome className="image-icon" name="sync-alt" title="Rotate"/>
-                </button>
-                <button style={noButton} onClick={this.delete}>
-                    <FontAwesome className="image-icon" name="trash-alt" title="delete"/>
-                </button>
-                <button style={noButton} onClick={this.expand}>
-                    <FontAwesome className="image-icon" name="expand" title="expand"/>
-                </button>
+                      <button style={noButton} onClick={this.rotate}>
+                          <FontAwesome className="image-icon" name="sync-alt" title="Rotate"/>
+                      </button>
+                      <button style={noButton} onClick={this.delete}>
+                          <FontAwesome className="image-icon" name="trash-alt" title="Delete"/>
+                      </button>
+                      <button style={noButton} onClick={this.expand}>
+                          <FontAwesome className="image-icon" name="expand" title="Expand"/>
+                      </button>
+                  </div>
               </div>
-            </div>
     );
   }
 }

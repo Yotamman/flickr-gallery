@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import Image from '../Image';
-import Container from 'react-photo-container';
+import Lightbox from 'react-images';
 import './Gallery.scss';
 
 class Gallery extends React.Component {
@@ -14,8 +14,48 @@ class Gallery extends React.Component {
     super(props);
     this.state = {
       images: [],
-      galleryWidth: this.getGalleryWidth()
+      galleryWidth: this.getGalleryWidth(),
+      expandImage: false,
+      currentImage: 0
     };
+    this.closeLightbox = this.closeLightbox.bind(this);
+    this.gotoNext = this.gotoNext.bind(this);
+    this.gotoPrevious = this.gotoPrevious.bind(this);
+    this.openLightbox = this.openLightbox.bind(this);
+    this.urlFromObj = this.urlFromObj.bind(this);
+  }
+
+  openLightbox(expanded,index) {
+        this.setState({
+          expandImage: expanded,
+          currentImage: index
+        });
+  }
+
+  gotoPrevious(){
+    this.setState({
+      currentImage: this.state.currentImage - 1
+    });
+    
+  }
+
+  gotoNext(){
+    this.setState({
+      currentImage: this.state.currentImage + 1
+    });
+  }
+
+  handleClickImage () {
+    if (this.state.currentImage === this.state.images.length - 1) return;
+
+    this.gotoNext();
+  }
+
+  closeLightbox(){
+    this.setState({
+      currentImage: 0,
+      expandImage: false
+    });
   }
 
   getGalleryWidth(){
@@ -47,31 +87,56 @@ class Gallery extends React.Component {
       });
   }
 
-  setPhotos(){
-
+  onScroll(){
+    if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100)) {
+      // let newPerPage = this.state.page + 90;
+      // this.setState({page: newPerPage})
+      // this.getImages(props.tag)
+      
+      alert('scroll!!');
+    }
   }
 
   componentDidMount() {
+    window.addEventListener('resize',
+        this.setState({
+          galleryWidth: document.body.clientWidth
+        })
+    );
+    //window.addEventListener('scroll', this.onScroll, false);
     this.getImages(this.props.tag);
-    this.setState({
-      galleryWidth: document.body.clientWidth
-    });
+  }
+
+  urlFromObj(obj) {
+    return {src: `https://farm${obj.farm}.staticflickr.com/${obj.server}/${obj.id}_${obj.secret}.jpg`}
   }
 
   componentWillReceiveProps(props) {
     this.getImages(props.tag);
   }
 
-//<Container photos={this.state.images}/>
   render() {
+    const { expandImage } = this.state;
+    if(expandImage){
+        var fullScrImage=
+                        <Lightbox
+                            images={this.state.images.map(img => this.urlFromObj(img))}
+                            currentImage={this.state.currentImage}
+                            isOpen={this.state.expandImage}
+                            onClickPrev={this.gotoPrevious}
+                            onClickNext={this.gotoNext}
+                            onClose={this.closeLightbox}
+                        />
+    }
+    else fullScrImage=null;
+    var i=0;
     return (
-      <div className="gallery-root">
-        {this.state.images.map(dto => {
-          return <Image key={'image-' + dto.id} dto={dto} galleryWidth={this.state.galleryWidth}/>;
-        })}
-
-      </div>
-      
+        <div className="gallery-root">
+          { this.state.images.map(dto => {
+            return <Image key={'image-' + dto.id} dto={dto} galleryWidth={this.state.galleryWidth} getExpanded={this.openLightbox} index={i++}/>;
+          })}
+        <div> { fullScrImage }</div>
+        </div>
     );
   }
 }
