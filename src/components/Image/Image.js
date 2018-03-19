@@ -63,41 +63,48 @@ class Image extends React.Component {
       this.props.getExpanded(true,this.props.index);
     }
 
-    render() {
-        const { rotation } =  this.state;
-        const { showImage } = this.state;
-        var noButton = {//this style is in order to remove the button GUI component
-             backgroundColor: 'Transparent',
-             outline: 'none',
-             border: 'none',
-             overflow: 'hidden',
-             padding:0
-      }
-
-      if(showImage){//Conditional Rendering, wether or not to show the image
-          var showImageSt = {
-              backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
-              width: this.state.size + 'px',
-              height: this.state.size + 'px',
-              transform: `rotate(${rotation}deg)`
-          }
-      }
-      return (
-                <div className="image-root" style={showImageSt}>
-                <div style={{transform: `rotate(${-rotation}deg)`}}>
-                        <button style={noButton} onClick={this.rotate}>
-                            <FontAwesome className="image-icon" name="sync-alt" title="Rotate"/>
-                        </button>
-                        <button style={noButton} onClick={this.delete}>
-                            <FontAwesome className="image-icon" name="trash-alt" title="Delete"/>
-                        </button>
-                        <button style={noButton} onClick={this.expand}>
-                            <FontAwesome className="image-icon" name="expand" title="Expand"/>
-                        </button>
-                    </div>
-                </div>
-      );
+  render() {
+      const { rotation } =  this.state;
+      const { showImage } = this.state;
+      var noButton = {//this style is in order to remove the button GUI component
+           backgroundColor: 'Transparent',
+           outline: 'none',
+           border: 'none',
+           overflow: 'hidden',
+           padding:0
     }
+
+    if(showImage){//Conditional Rendering, wether or not to show the image
+        var showImageSt = {
+            backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
+            width: this.state.size + 'px',
+            height: this.state.size + 'px',
+            transform: `rotate(${rotation}deg)`
+        }
+    } 
+    else showImageSt={
+           backgroundImage: null,
+           outline: 'none',
+           border: 'none',
+           overflow: 'hidden',
+           padding:0
+    };
+    return (
+              <div className="image-root" style={showImageSt}>
+              <div style={{transform: `rotate(${-rotation}deg)`}}>
+                      <button style={noButton} onClick={this.rotate}>
+                          <FontAwesome className="image-icon" name="sync-alt" title="Rotate"/>
+                      </button>
+                      <button style={noButton} onClick={this.delete}>
+                          <FontAwesome className="image-icon" name="trash-alt" title="Delete"/>
+                      </button>
+                      <button style={noButton} onClick={this.expand}>
+                          <FontAwesome className="image-icon" name="expand" title="Expand"/>
+                      </button>
+                  </div>
+              </div>
+    );
+  }
 }
 
 export default Image;

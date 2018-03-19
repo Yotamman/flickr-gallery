@@ -16,13 +16,15 @@ class Gallery extends React.Component {
           images: [],
           galleryWidth: this.getGalleryWidth(),
           expandImage: false,
-          currentImage: 0
+          currentImage: 0,
+          // pageNum: 1
         };
         this.closeLightbox = this.closeLightbox.bind(this);
         this.gotoNext = this.gotoNext.bind(this);
         this.gotoPrevious = this.gotoPrevious.bind(this);
         this.openLightbox = this.openLightbox.bind(this);
-        this.urlFromObj = this.urlFromObj.bind(this);
+        this.toObj = this.toObj.bind(this);
+        this.getImagesWPage = this.getImagesWPage.bind(this);
       }
 
       openLightbox(expanded,index) {
@@ -60,8 +62,8 @@ class Gallery extends React.Component {
         }
       }
 
-      getImages(tag) {
-        const getImagesUrl = `services/rest/?method=flickr.photos.search&api_key=522c1f9009ca3609bcbaf08545f067ad&tags=${tag}&tag_mode=any&per_page=100&format=json&nojsoncallback=1`;
+      getImagesWPage(tag) {
+        const getImagesUrl = `services/rest/?method=flickr.photos.search&api_key=522c1f9009ca3609bcbaf08545f067ad&tags=${tag}&tag_mode=any&page=${this.state.pageNum}&per_page=100&format=json&nojsoncallback=1`;
         const baseUrl = 'https://api.flickr.com/';
         axios({
           url: getImagesUrl,
@@ -81,15 +83,18 @@ class Gallery extends React.Component {
           });
       }
 
-      onScroll(){
-        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100)) {
-          // let newPerPage = this.state.page + 90;
-          // this.setState({page: newPerPage})
-          // this.getImages(props.tag)
-          
-          console.log('scroll!!');
-        }
+      getImages(tag){
+        this.getImagesWPage(tag,1);
       }
+
+      // onScroll(){ 
+      //   console.log('alert');
+      //   if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100)) {
+      //       let newPageNum=this.state.pageNum + 1;
+      //       this.setState({pageNum: newPageNum});
+      //       getImagesWPage(this.props.tag,this.state.pageNum)
+      //   }
+      // }
 
       componentDidMount() {
         window.addEventListener('resize',
@@ -97,12 +102,11 @@ class Gallery extends React.Component {
               galleryWidth: document.body.clientWidth
             })
         );
-        //window.addEventListener('scroll', this.onScroll, false);
+        // window.addEventListener('scroll', this.onScroll, false);
         this.getImages(this.props.tag);
       }
 
-      urlFromObj(obj) {
-        console.log(obj);
+      toObj(obj) {
         return {src: `https://farm${obj.farm}.staticflickr.com/${obj.server}/${obj.id}_${obj.secret}_b.jpg`}
       }
 
@@ -115,7 +119,7 @@ class Gallery extends React.Component {
         if(expandImage){
             var fullScrImage=
                             <Lightbox
-                                images={this.state.images.map(img => this.urlFromObj(img))}//maps the obj array of images
+                                images={this.state.images.map(img => this.toObj(img))}//maps the obj array of images
                                 currentImage={this.state.currentImage}
                                 isOpen={this.state.expandImage}
                                 onClickPrev={this.gotoPrevious}
